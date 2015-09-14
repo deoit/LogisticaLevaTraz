@@ -155,9 +155,7 @@ Um exemplo de requisição à busca de rota mais curta seria:
 
  
 
-$$
 https://uawajzheeg.execute-api.us-east-1.amazonaws.com/test/rota?mapName=MapaSP&src=A&dst=D&autonomy=25&autonomyPrice=2.5
-$$
 
  
 
@@ -185,13 +183,9 @@ Foram mapeados os seguintes códigos de retorno para os recursos :
 
  
 
-$$
 /test/rota
-$$
 
-$$
 /test/mapa
-$$
 
  
 
