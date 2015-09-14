@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import br.com.s2it.teste.functions.Main;
-import br.com.s2it.teste.responde.RouteResponse;
+import br.com.s2it.teste.response.RouteResponse;
 import br.com.s2it.teste.vos.MapVO;
 import br.com.s2it.teste.vos.RouteVO;
 

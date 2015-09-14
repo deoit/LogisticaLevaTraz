@@ -11,7 +11,7 @@
  * @version 0.0.1 levaetraz
  * 
  */
-package br.com.s2it.teste.responde;
+package br.com.s2it.teste.response;
 
 import br.com.s2it.teste.validations.Nullable;
 
@@ -22,16 +22,6 @@ public class RouteResponseNull extends RouteResponse implements Nullable {
 
 	/** The descricao. */
 	private String descricao;
-
-	/**
-	 * Gets the descricao.
-	 *
-	 * @return the descricao
-	 */
-	public String getDescricao() {
-
-		return descricao;
-	}
 
 	/**
 	 * Sets the descricao.

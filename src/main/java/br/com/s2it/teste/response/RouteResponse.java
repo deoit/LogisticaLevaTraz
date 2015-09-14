@@ -11,7 +11,7 @@
  * @version 0.0.1 levaetraz
  * 
  */
-package br.com.s2it.teste.responde;
+package br.com.s2it.teste.response;
 
 import java.math.BigDecimal;
 import java.util.List;

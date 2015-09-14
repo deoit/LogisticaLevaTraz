@@ -16,14 +16,13 @@ package br.com.s2it.teste.functions;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import br.com.s2it.teste.dijkstra.Point;
 import br.com.s2it.teste.dijkstra.RouteFinder;
 import br.com.s2it.teste.requests.RouteRequest;
-import br.com.s2it.teste.responde.RouteResponse;
+import br.com.s2it.teste.response.GenericResponse;
+import br.com.s2it.teste.response.RouteResponse;
 import br.com.s2it.teste.utils.DynamoDBUtils;
 import br.com.s2it.teste.validations.ValidationUtils;
 import br.com.s2it.teste.vos.MapVO;
@@ -38,102 +37,84 @@ public class Main {
 
 	/**
 	 * Save map handler.
-	 *
-	 * @param mapRequest the map request
-	 * @param context the context
+	 * 
+	 * @param mapRequest
+	 *            the map request
+	 * @param context
+	 *            the context
 	 * @return the map
+	 * @throws Exception
 	 */
-	public static Map<String, String> saveMapHandler(MapVO mapRequest, Context context) {
+	public static GenericResponse saveMapHandler(MapVO mapRequest, Context context) throws IllegalArgumentException {
 
 		LambdaLogger logger = context.getLogger();
 		MapVO map = ValidationUtils.getMapInstance(mapRequest);
-		Map<String, String> message = new HashMap<String, String>();
 
-		if (!map.ehNulo()) {
-
-			String mapName = map.getName();
-			logger.log("Saving Map: " + mapName + " \n");
-			DynamoDBUtils.saveMap(map);
-			message.put("Info", "done!");
-
-			return message;
+		if (map.ehNulo()) {
+			throw new IllegalArgumentException(map.descricaoFalha());
 		}
 
-		message.put("Error", "MapVO data model validation fail.");
-		return message;
+		String mapName = map.getName();
+		logger.log("Saving Map: " + mapName + " \n");
+		DynamoDBUtils.saveMap(map);
+
+		return new GenericResponse("Request successfull");
 	}
 
 	/**
 	 * Find best route handler.
-	 *
-	 * @param routeRequest the route request
-	 * @param context the context
+	 * 
+	 * @param routeRequest
+	 *            the route request
+	 * @param context
+	 *            the context
 	 * @return the route response
 	 */
-	public static RouteResponse findBestRouteHandler(RouteRequest routeRequest, Context context) {
+	public static RouteResponse findBestRouteHandler(RouteRequest routeRequest, Context context) throws Exception {
 
 		LambdaLogger logger = context.getLogger();
 		RouteRequest req = ValidationUtils.getRouteRequestInstance(routeRequest);
 
-		if (!req.ehNulo()) {
-
-			String mapName = req.getMapName();
-			logger.log("Loading Map: " + mapName + " \n");
-			MapVO mapRetrieved = DynamoDBUtils.loadMap(mapName);
-			MapVO map = ValidationUtils.getMapInstance(mapRetrieved);
-			
-			if(!map.ehNulo()){
-				return makeResponse(req, map);
-			}
-			
-			return RouteResponse.newNull(map.descricaoFalha());
+		if (req.ehNulo()) {
+			throw new IllegalArgumentException(req.descricaoFalha());
 		}
-		
-		return RouteResponse.newNull("RouteRequest data model validation fail.");
-	}
 
-	/**
-	 * Make response.
-	 *
-	 * @param req the req
-	 * @param map the map
-	 * @return the route response
-	 */
-	private static RouteResponse makeResponse(RouteRequest req, MapVO map) {
+		String mapName = req.getMapName();
+		logger.log("Loading Map: " + mapName + " \n");
+		MapVO mapRetrieved = DynamoDBUtils.loadMap(mapName);
+		MapVO map = ValidationUtils.getMapInstance(mapRetrieved);
+
+		if (map.ehNulo()) {
+			throw new IllegalArgumentException(map.descricaoFalha());
+		}
 
 		RouteResponse response = findRoute(req.getSrc(), req.getDst(), map);
+		RouteResponse resp = ValidationUtils.getRouteResponseInstance(response);
 
-		if (response != null) {
-
-			BigDecimal autonomy = req.getAutonomy();
-			BigDecimal autonomyPrice = req.getAutonomyPrice();
-			Double minDistance = response.getMinDistance();
-
-			if (minDistance != Double.POSITIVE_INFINITY) {
-				BigDecimal distance = new BigDecimal(minDistance);
-
-				if (autonomy.compareTo(distance) >= 0) {
-					response.setCost(autonomyPrice);
-				} else {
-					BigDecimal result = distance.divide(autonomy, RoundingMode.HALF_UP).multiply(autonomyPrice);
-					response.setCost(result);
-				}
-			} else {
-				response = RouteResponse.newNull("Unreachable route");
-			}
-
-			return response;
+		if (resp.ehNulo()) {
+			throw new IllegalArgumentException(resp.descricaoFalha());
 		}
 
-		return RouteResponse.newNull("Source or Destination not found on map " + map.getName() + ".");
+		BigDecimal autonomy = req.getAutonomy();
+		BigDecimal autonomyPrice = req.getAutonomyPrice();
+		Double minDistance = response.getMinDistance();
+
+		BigDecimal distance = new BigDecimal(minDistance).setScale(1);
+		BigDecimal result = distance.divide(autonomy, RoundingMode.HALF_UP).multiply(autonomyPrice);
+		response.setCost(result);
+
+		return response;
 	}
 
 	/**
 	 * Find route.
-	 *
-	 * @param src the src
-	 * @param dst the dst
-	 * @param map the map
+	 * 
+	 * @param src
+	 *            the src
+	 * @param dst
+	 *            the dst
+	 * @param map
+	 *            the map
 	 * @return the route response
 	 */
 	public static RouteResponse findRoute(String src, String dst, MapVO map) {
@@ -152,13 +133,13 @@ public class Main {
 
 			RouteResponse response = new RouteResponse();
 			response.setMinDistance(pDst.minDistance);
-			
+
 			List<String> pathList = new ArrayList<String>();
-			
+
 			for (Point p : path) {
-				pathList.add(p.toString());	
+				pathList.add(p.toString());
 			}
-			
+
 			response.setPath(pathList);
 			return response;
 		}
@@ -168,9 +149,11 @@ public class Main {
 
 	/**
 	 * Prints the map info handler.
-	 *
-	 * @param map the map
-	 * @param context the context
+	 * 
+	 * @param map
+	 *            the map
+	 * @param context
+	 *            the context
 	 * @return the string
 	 */
 	public static String printMapInfoHandler(MapVO map, Context context) {
