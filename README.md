@@ -52,13 +52,11 @@ Lambda](<https://aws.amazon.com/lambda/>) utilize:
 
  
 
-$$
 mvn clean package shade:shade
-$$
 
  
 
-Obs: As funções são executadas com timeout de 9 e 512MB.
+Obs: As funções são executadas com timeout de 9 segundos e 512MB de RAM.
 
  
 
