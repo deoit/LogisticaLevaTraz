@@ -1,78 +1,75 @@
-Logística - Leva e Traz
+Takes and brings
 =======================
 
  
 
-Exemplo de implementação utilizando algoritmo para cálculo de rotas e seus
-respectivos custos.
+Sample implementation using algorithm to calculate routes and their
+related costs.
 
  
 
-Arquitetura do Projeto
+Project architecture
 ----------------------
 
  
+The project was implemented using Java language. For management
+dependencies, build phases and artifacts packaging,
+[Maven](<https://maven.apache.org>) is used.
 
-O projeto foi implementado utilizando-se de linguagem Java. Para gestão de
-dependências, execução das fases de compilação e empacotamento do artefato,
-[Maven](<https://maven.apache.org>) é utilizado.
-
-Desenhado para ser executado sobre o serviço [Amazon
-Lambda](<https://aws.amazon.com/lambda/>) e com persistência em DataBase
+Drawing to be executed on the service [Amazon
+Lambda](<https://aws.amazon.com/lambda/>) and data persistence with
 [NoSQL](<https://www.google.com.br/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&cad=rja&uact=8&ved=0CCUQFjACahUKEwirmP_d4PTHAhWBDpAKHWgPBZ8&url=https%3A%2F%2Fpt.wikipedia.org%2Fwiki%2FNoSQL&usg=AFQjCNFBP3QwsZfT1L6YqvnRdDLtjMFXhw&sig2=6L6i0MWRtLN1Z5WiVTSmNg>)
-DynamoDB. Os serviços são expostos via Rest utilizando-se do serviço [Gateway
+DynamoDB. The services are exposed via Rest using the service [Gateway
 API.](<https://aws.amazon.com/api-gateway/>)
 
  
 
-Pré-Requisitos
+Prerequisites
 --------------
 
  
 
-1.  Conta na plataforma de serviços AWS.
+1.  AWS Account.
 
-2.  Maven para gestão de dependências e empacotamento do artefato.
+2.  Maven for dependency management and device packaging.
 
  
 
-Obs: Para facilitar os testes a última versão do código já foi implantada e está
-exposta pelo endpoint
+The latest version of the code has been implemented and is
+exposed by the endpoint
 [https://uawajzheeg.execute-api.us-east-1.amazonaws.com](<https://uawajzheeg.execute-api.us-east-1.amazonaws.com>)
 
  
 
-Fases de Build
+Build Phases
 --------------
 
  
 
-Para empacotar o projeto para distribuição via [Amazon
-Lambda](<https://aws.amazon.com/lambda/>) utilize:
+To package the project for run in [Amazon
+Lambda](<https://aws.amazon.com/lambda/>) use:
 
  
 
-$$
 mvn clean package shade:shade
-$$
 
  
 
-Obs: As funções são executadas com timeout de 9 e 512MB.
+The functions are performed with a timeout of 9 seconds and 512MB of RAM.
 
  
 
-Criando malha viária
+Creating road network
 --------------------
 
-A criação de malha viária (mapa) será feita com uma requisição **HTTP** ao
-endpoint acima descrito utilizando-se do método **POST** e recurso**
+The creation of road network (map) will be made on a request **HTTP**to
+endpoint described above using the method **POST** and resource**
 /test/mapa**.
 
  
 
-Para criação do mapa o método deverá ser invocado com  seguindo os requisitos
-abaixo descritos.
+For map creation method must be invoked with the following requirements
+described below.
 
  
 
@@ -104,7 +101,7 @@ abaixo descritos.
 
  
 
-O response segue o modelo:
+The response follows the model:
 
  
 
@@ -121,16 +118,16 @@ O response segue o modelo:
 
  
 
-Buscando a rota mais curta
+Finding the shortest path
 --------------------------
 
-A busca da rota mais curta será feita com uma requisição **HTTP** ao endpoint
-acima descrito utilizando-se do método **GET** e recurso** /test/rota**.
+The search for the shortest route will be with a request **HTTP** to endpoint
+described above using the method **GET** and resource** /test/rota**.
 
  
 
-Para busca de melhor rota o método deverá ser invocado com  seguindo os
-requisitos abaixo descritos.
+To search the best route the method should be invoked with the following
+requirements described below.
 
 1.  Header = **Content-Type: application/json**
 
@@ -153,18 +150,16 @@ requisitos abaixo descritos.
 
 
 
-Um exemplo de requisição à busca de rota mais curta seria:
+An example request the shortest path search would:
 
  
 
-$$
 https://uawajzheeg.execute-api.us-east-1.amazonaws.com/test/rota?mapName=MapaSP&src=A&dst=D&autonomy=25&autonomyPrice=2.5
-$$
 
  
 
-Atenção: Não esqueça de configurar o recurso  [Gateway API] acima descrito com
-“Integration Request” abaixo:
+Warning: Do not forget to set the feature [Gateway API] described above with
+"Integration Request" below:
 
  
 
@@ -180,20 +175,16 @@ Atenção: Não esqueça de configurar o recurso  [Gateway API] acima descrito c
 
  
 
-Códigos de Retorno
+Return codes
 ------------------
 
-Foram mapeados os seguintes códigos de retorno para os recursos :
+The following return codes were mapped to the resources :
 
  
 
-$$
 /test/rota
-$$
 
-$$
 /test/mapa
-$$
 
  
 
@@ -205,7 +196,7 @@ $$
 
  
 
-Modelo de “Integration Response”:
+“Integration Response” model:
 
  
 
